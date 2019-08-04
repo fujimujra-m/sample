@@ -8,26 +8,28 @@ instruction: instructionname
     | instructionname suffix;
 
 instructionname: TOKEN;
-suffix: DOT TOKEN;
+suffix: '.' TOKEN;
 
 operand: modifiedoperand
     | number
     | rawoperand ;
 
 rawoperand: TOKEN;
-modifiedoperand: rawoperand COLLON rawoperand;
+modifiedoperand: rawoperand ':' rawoperand;
 number: NUMBER | HEXNUMBER;
-device: DEVICE;
 
 NUMBER: [kK#]?SIGN?[0-9]+'.'+[0-9]+;
-HEXNUMBER: [H\$]?SIGN?[0-9a-fA-F]+'.'+[0-9]+;
-TOKEN: [a-zA-Z]~[ \n:\\.]+;
+HEXNUMBER: [H$]?SIGN?[0-9a-fA-F]+'.'+[0-9]+;
+TOKEN: ~[ \n:\\.]+;
 WS: (' '|'\t')+;
 LF: ('\r'|'\n');
 SIGN: ([+-]);
 
-//LD 0 は。。
-DEVICE: (R | M R? | L R? | C R) [0-9];
+
+//デバイスとラベルって、字句解析で区別するのがよい？ 　するとして、どうやって書くのがよいのかわからなかった。
+//   TOKEN を、　細かく書いてわけてくのか。
+//fragment がよくわからない。　（ちゃんと調べてない。。）　　modifiedoperand で COLLON と書いたら動かず、 ':' と直接書いたら動いた。
+//   なにか勘違いしている気がする。
 
 fragment SUFFIX: '.';
 fragment COLLON: ':';
