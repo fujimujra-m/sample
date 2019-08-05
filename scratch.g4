@@ -8,30 +8,48 @@ instruction: instructionname
     | instructionname suffix;
 
 instructionname: TOKEN;
-suffix: '.' TOKEN;
+suffix: DOT_MODIFER SUFFIX;
 
-operand: modifiedoperand
+operand: INDIRECT_MODIFIER? modifiedoperand
     | number
-    | rawoperand ;
+    | INDIRECT_MODIFIER? rawoperand;
 
-rawoperand: TOKEN;
-modifiedoperand: rawoperand ':' rawoperand;
-number: NUMBER | HEXNUMBER;
+rawoperand: TOKEN
+    | rawlocaloperand;
 
-NUMBER: [kK#]?SIGN?[0-9]+'.'+[0-9]+;
-HEXNUMBER: [H$]?SIGN?[0-9a-fA-F]+'.'+[0-9]+;
-TOKEN: ~[ \n:\\.]+;
+rawlocaloperand: LOCAL_MODIFER rawoperand;
+
+modifiedoperand: rawoperand INDEX_MODIFER (rawoperand|number)
+    | wordbit_operand;
+
+
+wordbit_operand: rawoperand DOT_MODIFER NUMBER;
+
+number: NUMBER
+    | HEXNUMBER;
+
+LOCAL_MODIFER: '@';
+INDIRECT_MODIFIER: '*';
+DOT_MODIFER: DOT;
+INDEX_MODIFER: COLLON;
+
+NUMBER: [kK#]?SIGN?[0-9]*('.'[0-9]+('e'[0-9]+)?)?;
+HEXNUMBER: [$H]?SIGN?[0-9a-fA-F]+;
 WS: (' '|'\t')+;
 LF: ('\r'|'\n');
 SIGN: ([+-]);
 
 
+SUFFIX: (S|L|U|D|D F|F);
+TOKEN: ~[ @\n:\\.\\*]+;
+
+//TOKENから * を除外すると、　CAL* だけ区別しないとだめになるなあ
+
 //デバイスとラベルって、字句解析で区別するのがよい？ 　するとして、どうやって書くのがよいのかわからなかった。
 //   TOKEN を、　細かく書いてわけてくのか。
-//fragment がよくわからない。　（ちゃんと調べてない。。）　　modifiedoperand で COLLON と書いたら動かず、 ':' と直接書いたら動いた。
-//   なにか勘違いしている気がする。
 
-fragment SUFFIX: '.';
+//ワード中ビットが書けてない。
+
 fragment COLLON: ':';
 fragment DOT: '.';
 
